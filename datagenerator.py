@@ -5,7 +5,7 @@ import random
 import os
 
 
-files = os.listdir('backgrounds/')
+files = os.listdir('/Users/Family/PycharmProjects/VisionTracking/backgrounds')
 
 
 class GeneratorThread(Thread):
@@ -134,6 +134,7 @@ def get_batch():
 	global current_generator
 	if current_generator is None:
 		return None
+	block_until_ready()
 	if not current_generator.ready:
 		return None
 	batch = current_generator.batch
