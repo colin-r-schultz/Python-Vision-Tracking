@@ -9,24 +9,25 @@ files = os.listdir('/Users/Family/PycharmProjects/VisionTracking/backgrounds')
 
 
 class GeneratorThread(Thread):
-	def __init__(self, batch_size):
+	def __init__(self, batch_size, img_size=(480, 640)):
 		Thread.__init__(self)
 		self.batch_size = batch_size
+		self.img_size = img_size
 		self.ready = False
 		self.batch = None
 
 	def run(self):
-		self.batch = generate_batch(self.batch_size)
+		self.batch = generate_batch(self.batch_size, self.img_size)
 		self.ready = True
 
 current_generator = None
 
 
-def generate_batch(batch_size):
-	batch = np.zeros((batch_size, 488, 648, 3), dtype=np.float32)
+def generate_batch(batch_size, size=(480, 640)):
+	batch = np.zeros((batch_size, size[0], size[1], 3), dtype=np.float32)
 	labels = np.zeros((batch_size, 15, 20, 1), dtype=np.float32)
 	for i in range(batch_size):
-		generate_img(batch[i, 4:484, 4:644, :], labels[i])
+		generate_img(batch[i], labels[i])
 	return batch, labels
 
 
@@ -78,13 +79,36 @@ def generate_img(mat, label_mat):
 	bkg = np.clip(bkg, 0, 1)
 	label = cv2.resize(label, (20, 15), interpolation=cv2.INTER_AREA)
 	label = label.reshape((15, 20, 1))
+	bkg = compress_and_decompress(bkg)
+	h, w, _ = mat.shape
+	bkg = cv2.resize(bkg, (w, h))
 	mat += bkg
 	label_mat += label
+
+
+def compress_and_decompress(img):
+	img = image_to_int(img)
+	quality = 90
+	params = [int(cv2.IMWRITE_JPEG_QUALITY), quality]
+	_, comp = cv2.imencode('.jpeg', img, params)
+	while comp.size > 60000:
+		quality -= 10
+		params = [int(cv2.IMWRITE_JPEG_QUALITY), quality]
+		_, comp = cv2.imencode('.jpeg', img, params)
+	img = cv2.imdecode(comp, cv2.IMREAD_COLOR)
+	img = image_to_float(img)
+	return img
 
 
 def image_to_float(img):
 	img = img.astype(np.float32)
 	img /= 255
+	return img
+
+
+def image_to_int(img):
+	img *= 255
+	img = img.astype(np.uint8)
 	return img
 
 
@@ -124,9 +148,9 @@ def block_until_ready():
 	current_generator.join()
 
 
-def create_batch(batch_size):
+def create_batch(batch_size, img_size=(480, 640)):
 	global current_generator
-	current_generator = GeneratorThread(batch_size)
+	current_generator = GeneratorThread(batch_size, img_size)
 	current_generator.start()
 
 
@@ -143,8 +167,7 @@ def get_batch():
 
 if __name__ == "__main__":
 	while True:
-		create_batch(1)
-		block_until_ready()
+		create_batch(1, (240, 320))
 		batch, label = get_batch()
 		image = batch[0]
 		cv2.imshow('image', image)
