@@ -18,7 +18,7 @@ class BinaryWeightedAverage(PostProcess):
 		self.t = thresh
 
 	def run(self, img):
-		img = np.greater(img, self.t)
+		img = np.greater(img, self.t) * img
 		xw = np.sum(img, 0)
 		yw = np.sum(img, 1)
 		if np.sum(xw) == 0 or np.sum(yw) == 0:

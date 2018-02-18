@@ -7,7 +7,7 @@ from postprocessors import BinaryWeightedAverage
 
 from ogmodel import OGModel
 
-source = Client()
+source = CameraInput()
 model = OGModel()
 model.load_model()
 display = Display()

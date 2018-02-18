@@ -5,7 +5,8 @@ import random
 import os
 
 
-files = os.listdir('/Users/Family/PycharmProjects/VisionTracking/backgrounds')
+backgrounds = os.listdir('backgrounds')
+images = os.listdir('images')
 
 
 class GeneratorThread(Thread):
@@ -32,11 +33,11 @@ def generate_batch(batch_size, size=(480, 640)):
 
 
 def generate_img(mat, label_mat):
-	file = random.choice(files)
+	file = random.choice(backgrounds)
 	bkg = cv2.imread('backgrounds/' + file, cv2.IMREAD_COLOR)
 	bkg = image_to_float(bkg)
-	i = random.randint(0, 6)
-	img = cv2.imread('images/image{}.png'.format(i), cv2.IMREAD_UNCHANGED)
+	file = random.choice(images)
+	img = cv2.imread('images/' + file, cv2.IMREAD_UNCHANGED)
 	img = image_to_float(img)
 	color_scale = 0.5 + random.random() * 1.2
 	img[:, :, :3] *= color_scale

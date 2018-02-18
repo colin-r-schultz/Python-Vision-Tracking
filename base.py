@@ -18,15 +18,26 @@ class Model(Process):
 		self.sess = tf.Session()
 		self.input = None
 		self.output = None
-		self.labelin = None
+		self.label_in = None
 		self.loss = None
 		self.optimize = None
-		self.allow_train = False
-		self.build_model(train)
-		self.saver = tf.train.Saver()
-
-	def build_model(self, train=False):
 		self.allow_train = train
+		self.build_model()
+		if train:
+			self.create_loss()
+		self.saver = tf.train.Saver()
+		self.sess.run(tf.global_variables_initializer())
+
+	def build_model(self):
+		pass
+
+	def create_loss(self):
+		self.label_in = tf.placeholder(dtype=tf.float32, shape=[None, 15, 20, 1])
+		self.loss = tf.reduce_sum(tf.square(self.label_in - self.output), name='loss')
+		self.optimize = self.create_optimizer().minimize(self.loss)
+
+	def create_optimizer(self):
+		return tf.train.AdamOptimizer(0.001)
 
 	def save_model(self):
 		self.saver.save(self.sess, 'save/' + self.name + '.save')
@@ -45,9 +56,9 @@ class Model(Process):
 			batch, label = datagenerator.get_batch()
 			datagenerator.create_batch(batch_size)
 			for j in range(epochs):
-				self.sess.run(self.optimize, feed_dict={self.input: batch, self.labelin: label})
+				self.sess.run(self.optimize, feed_dict={self.input: batch, self.label_in: label})
 			print('Completed batch {0} of {1} ({2}%)'.format(i + 1, batches, (i + 1) * 100 / batches))
-			loss_n = self.sess.run(self.loss, feed_dict={self.input: batch, self.labelin: label})
+			loss_n = self.sess.run(self.loss, feed_dict={self.input: batch, self.label_in: label})
 			print('Loss: {}'.format(loss_n.reshape((1,))[0]))
 			if checkpoint != 0 and (i + 1) % checkpoint == 0:
 				self.save_model()
@@ -60,6 +71,9 @@ class Input:
 
 	def get(self):
 		return None
+
+	def send(self, data):
+		print(data)
 
 
 class PostProcess:
@@ -83,9 +97,5 @@ class Display:
 
 	def display_augmented(self, img, data, name='augmented'):
 		if data is not None:
-			img = cv2.circle(img, (int(data[0]), int(data[1])), 10, np.array([0, 0, 1.0]))
+			img = cv2.circle(img, (int(data[0]), int(data[1])), 5, np.array([0, 0, 255.0]), thickness=-1)
 		cv2.imshow(name, img)
-
-
-
-
