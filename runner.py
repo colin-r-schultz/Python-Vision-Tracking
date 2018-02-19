@@ -3,15 +3,16 @@ import numpy as np
 from base import Display
 from camerainput import CameraInput
 from client import Client
-from postprocessors import BinaryWeightedAverage
-
+from postprocessors import ThresholdBWA
+from halfsizemodel import HalfSizeModel
 from ogmodel import OGModel
 
-source = CameraInput()
-model = OGModel()
-model.load_model()
+source = Client()
+
+model2 = HalfSizeModel()
+model2.load_model()
 display = Display()
-post = BinaryWeightedAverage(0.9)
+post = ThresholdBWA(0.8, 0.4)
 
 
 def to_float(img):
@@ -21,13 +22,14 @@ def to_float(img):
 
 while True:
 	img = source.get()
+	print(img.shape)
 	fimg = to_float(img)
-	res = model.run(fimg).reshape((15, 20))
-	data = post.run(res)
-	source.send(data)
-	display.display_input(img)
-	display.display_output(res)
-	display.display_augmented(img, data)
+	bimg = cv2.resize(fimg, (640, 480))
+	res2 = model2.run(fimg).reshape((15, 20))
+	data2 = post.run(res2)
+	display.display_output(res2)
+	display.display_augmented(bimg, data2)
+	source.send(data2)
 	k = cv2.waitKey(1)
 	if k != -1:
 		break
