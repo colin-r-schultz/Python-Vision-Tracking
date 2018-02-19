@@ -26,3 +26,14 @@ class BinaryWeightedAverage(PostProcess):
 		x = 32 * np.average(xs, weights=xw)
 		y = 32 * np.average(ys, weights=yw)
 		return x, y
+
+
+class ThresholdBWA(PostProcess):
+	def __init__(self, detect, thresh):
+		self.detect = detect
+		self.bwa = BinaryWeightedAverage(thresh)
+
+	def run(self, img):
+		if np.max(img) < self.detect:
+			return None
+		return self.bwa.run(img)

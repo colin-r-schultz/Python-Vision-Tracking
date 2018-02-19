@@ -22,5 +22,9 @@ class OGModel(Model):
 	def build_model(self):
 		self.input, self.output = create_model()
 
+if __name__ == '__main__':
+	model = OGModel(True)
+	model.train(checkpoint=5)
+
 
 

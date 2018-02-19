@@ -21,7 +21,9 @@ class Model(Process):
 		self.label_in = None
 		self.loss = None
 		self.optimize = None
+		self.input_size = (480, 640)
 		self.allow_train = train
+		# with tf.variable_scope(name):
 		self.build_model()
 		if train:
 			self.create_loss()
@@ -41,6 +43,7 @@ class Model(Process):
 
 	def save_model(self):
 		self.saver.save(self.sess, 'save/' + self.name + '.save')
+		print('Model saved')
 
 	def load_model(self):
 		self.saver.restore(self.sess, 'save/' + self.name + '.save')
@@ -50,19 +53,28 @@ class Model(Process):
 
 	def train(self, batches=100, batch_size=32, epochs=5, checkpoint=5):
 		if not self.allow_train:
+			print('The model was not built to be trained')
 			return
-		datagenerator.create_batch(batch_size)
+		datagenerator.create_batch(batch_size, self.input_size)
+		losses = list()
 		for i in range(batches):
 			batch, label = datagenerator.get_batch()
-			datagenerator.create_batch(batch_size)
+			datagenerator.create_batch(batch_size, self.input_size)
 			for j in range(epochs):
 				self.sess.run(self.optimize, feed_dict={self.input: batch, self.label_in: label})
 			print('Completed batch {0} of {1} ({2}%)'.format(i + 1, batches, (i + 1) * 100 / batches))
 			loss_n = self.sess.run(self.loss, feed_dict={self.input: batch, self.label_in: label})
+			losses.append(loss_n)
 			print('Loss: {}'.format(loss_n.reshape((1,))[0]))
 			if checkpoint != 0 and (i + 1) % checkpoint == 0:
 				self.save_model()
 		print('Done')
+		try:
+			from matplotlib import pyplot as plt
+			plt.plot(losses)
+			plt.show()
+		except ImportError:
+			print('Requires matplotlib to graph loss')
 
 
 class Input:

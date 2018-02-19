@@ -5,8 +5,8 @@ import random
 import os
 
 
-backgrounds = os.listdir('backgrounds')
-images = os.listdir('images')
+backgrounds = os.listdir('/Users/Family/PycharmProjects/VisionTracking/backgrounds')
+images = os.listdir('/Users/Family/PycharmProjects/VisionTracking/images')
 
 
 class GeneratorThread(Thread):
@@ -41,7 +41,7 @@ def generate_img(mat, label_mat):
 	img = image_to_float(img)
 	color_scale = 0.5 + random.random() * 1.2
 	img[:, :, :3] *= color_scale
-	scale = 0.2 + random.random() * 1.3
+	scale = 0.2 + random.random() * 0.5
 	img = cv2.resize(img, None, fx=scale, fy=scale)
 	if random.random() < 0.5:
 		cv2.flip(img, 0, img)
@@ -71,7 +71,7 @@ def generate_img(mat, label_mat):
 	bkg = bkg[160:640, 80:720, :]
 	if random.random() < 0.5:
 		cv2.flip(bkg, 0, bkg)
-	color_scale = 0.5 + random.random() * 1.2
+	color_scale = 0.5 + random.random() * 1
 	bkg *= color_scale
 	mask = label.astype(np.int8)
 	mask = 1-mask
