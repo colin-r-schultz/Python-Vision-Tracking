@@ -7,7 +7,7 @@ from postprocessors import ThresholdBWA
 from halfsizemodel import HalfSizeModel
 from ogmodel import OGModel
 
-source = CameraInput()
+source = Client()
 
 model = HalfSizeModel()
 model.load_model()
@@ -32,7 +32,7 @@ while True:
 	source.send(data2)
 	k = cv2.waitKey(1)
 	if k != -1:
-		cv2.imwrite('input.png', img)
-		cv2.imwrite('output.png', cv2.resize(res2 * 255, (640, 480), interpolation=cv2.INTER_NEAREST))
-		cv2.imwrite('augmented.png', aimg)
+		# cv2.imwrite('input.png', img)
+		# cv2.imwrite('output.png', cv2.resize(res2 * 255, (640, 480), interpolation=cv2.INTER_NEAREST))
+		# cv2.imwrite('augmented.png', aimg)
 		break
