@@ -172,7 +172,10 @@ if __name__ == "__main__":
 		batch, label = get_batch()
 		image = batch[0]
 		cv2.imshow('image', image)
-		cv2.imshow('label', label[0])
+		res = cv2.resize(label[0], (320, 240), interpolation=cv2.INTER_NEAREST)
+		cv2.imshow('label', res)
 		k = cv2.waitKey(0)
 		if k == 27:
+			cv2.imwrite('input.png', image * 255)
+			cv2.imwrite('output.png', res * 255)
 			break

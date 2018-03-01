@@ -108,6 +108,8 @@ class Display:
 		cv2.imshow('output', img)
 
 	def display_augmented(self, img, data, name='augmented'):
+		img = img.copy()
 		if data is not None:
 			img = cv2.circle(img, (int(data[0]), int(data[1])), 5, np.array([0, 0, 255.0]), thickness=-1)
 		cv2.imshow(name, img)
+		return img
