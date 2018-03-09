@@ -10,23 +10,24 @@ images = os.listdir('/Users/Family/PycharmProjects/VisionTracking/images')
 
 
 class GeneratorThread(Thread):
-	def __init__(self, batch_size, img_size=(480, 640)):
+	def __init__(self, batch_size, img_size=(480, 640), label_size=(15, 20)):
 		Thread.__init__(self)
 		self.batch_size = batch_size
 		self.img_size = img_size
+		self.label_size = label_size
 		self.ready = False
 		self.batch = None
 
 	def run(self):
-		self.batch = generate_batch(self.batch_size, self.img_size)
+		self.batch = generate_batch(self.batch_size, self.img_size, self.label_size)
 		self.ready = True
 
 current_generator = None
 
 
-def generate_batch(batch_size, size=(480, 640)):
+def generate_batch(batch_size, size=(480, 640), label_size=(15, 20)):
 	batch = np.zeros((batch_size, size[0], size[1], 3), dtype=np.float32)
-	labels = np.zeros((batch_size, 15, 20, 1), dtype=np.float32)
+	labels = np.zeros((batch_size, label_size[0], label_size[1], 1), dtype=np.float32)
 	for i in range(batch_size):
 		generate_img(batch[i], labels[i])
 	return batch, labels
@@ -39,9 +40,9 @@ def generate_img(mat, label_mat):
 	file = random.choice(images)
 	img = cv2.imread('images/' + file, cv2.IMREAD_UNCHANGED)
 	img = image_to_float(img)
-	color_scale = 0.5 + random.random() * 1.2
+	color_scale = 0.5 + random.random() * 1.0
 	img[:, :, :3] *= color_scale
-	scale = 0.2 + random.random() * 0.5
+	scale = 0.5 + random.random() * 0.2
 	img = cv2.resize(img, None, fx=scale, fy=scale)
 	if random.random() < 0.5:
 		cv2.flip(img, 0, img)
@@ -71,15 +72,17 @@ def generate_img(mat, label_mat):
 	bkg = bkg[160:640, 80:720, :]
 	if random.random() < 0.5:
 		cv2.flip(bkg, 0, bkg)
-	color_scale = 0.5 + random.random() * 1
+	color_scale = 0.5 + random.random() * 1.0
 	bkg *= color_scale
 	mask = label.astype(np.int8)
 	mask = 1-mask
 	bkg = cv2.bitwise_and(bkg, bkg, mask=mask)
 	bkg = np.maximum(bkg, img)
 	bkg = np.clip(bkg, 0, 1)
-	label = cv2.resize(label, (20, 15), interpolation=cv2.INTER_AREA)
-	label = label.reshape((15, 20, 1))
+	h, w, _ = label_mat.shape
+	label = cv2.resize(label, (w, h), interpolation=cv2.INTER_AREA)
+	label = label.reshape((h, w, 1))
+	label = np.greater(label, 0.5)
 	bkg = compress_and_decompress(bkg)
 	h, w, _ = mat.shape
 	bkg = cv2.resize(bkg, (w, h))
@@ -149,9 +152,9 @@ def block_until_ready():
 	current_generator.join()
 
 
-def create_batch(batch_size, img_size=(480, 640)):
+def create_batch(batch_size, img_size=(480, 640), label_size=(15, 20)):
 	global current_generator
-	current_generator = GeneratorThread(batch_size, img_size)
+	current_generator = GeneratorThread(batch_size, img_size, label_size)
 	current_generator.start()
 
 
@@ -168,7 +171,7 @@ def get_batch():
 
 if __name__ == "__main__":
 	while True:
-		create_batch(1, (240, 320))
+		create_batch(1, (240, 320), (240, 320))
 		batch, label = get_batch()
 		image = batch[0]
 		cv2.imshow('image', image)

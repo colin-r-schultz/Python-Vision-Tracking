@@ -13,7 +13,7 @@ class Process:
 
 
 class Model(Process):
-	def __init__(self, name, train=False):
+	def __init__(self, name, train=False, input_size=(480, 640), output_size=(15, 20)):
 		self.name = name
 		self.sess = tf.Session()
 		self.input = None
@@ -21,12 +21,13 @@ class Model(Process):
 		self.label_in = None
 		self.loss = None
 		self.optimize = None
-		self.input_size = (480, 640)
+		self.input_size = input_size
+		self.label_size = output_size
 		self.allow_train = train
-		# with tf.variable_scope(name):
-		self.build_model()
-		if train:
-			self.create_loss()
+		with tf.variable_scope(name):
+			self.build_model()
+			if train:
+				self.create_loss()
 		self.saver = tf.train.Saver()
 		self.sess.run(tf.global_variables_initializer())
 
@@ -34,8 +35,12 @@ class Model(Process):
 		pass
 
 	def create_loss(self):
-		self.label_in = tf.placeholder(dtype=tf.float32, shape=[None, 15, 20, 1])
-		self.loss = tf.reduce_sum(tf.square(self.label_in - self.output), name='loss')
+		self.label_in = tf.placeholder(dtype=tf.float32, shape=[None, self.label_size[0], self.label_size[1], 1])
+		# self.loss = tf.reduce_sum(tf.square(self.label_in - self.output), name='loss')
+		union = tf.reduce_sum(self.label_in * self.output)
+		inter = tf.reduce_sum(self.label_in + self.output) - union
+		iou = union / inter
+		self.loss = 1.0 - iou
 		self.optimize = self.create_optimizer().minimize(self.loss)
 
 	def create_optimizer(self):
@@ -55,11 +60,11 @@ class Model(Process):
 		if not self.allow_train:
 			print('The model was not built to be trained')
 			return
-		datagenerator.create_batch(batch_size, self.input_size)
+		datagenerator.create_batch(batch_size, self.input_size, self.label_size)
 		losses = list()
 		for i in range(batches):
 			batch, label = datagenerator.get_batch()
-			datagenerator.create_batch(batch_size, self.input_size)
+			datagenerator.create_batch(batch_size, self.input_size, self.label_size)
 			for j in range(epochs):
 				self.sess.run(self.optimize, feed_dict={self.input: batch, self.label_in: label})
 			print('Completed batch {0} of {1} ({2}%)'.format(i + 1, batches, (i + 1) * 100 / batches))

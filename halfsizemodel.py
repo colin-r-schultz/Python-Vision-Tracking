@@ -18,9 +18,8 @@ def create_model():
 
 
 class HalfSizeModel(Model):
-	def __init__(self, train=False):
-		super().__init__('smallmodel', train)
-		self.input_size = (240, 320)
+	def __init__(self, train=False, input_size=(240, 320)):
+		super().__init__('model', train)
 
 	def build_model(self):
 		self.input, self.output = create_model()

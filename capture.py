@@ -16,7 +16,7 @@ while True:
 	k = cv2.waitKey(5)
 	if k == 32:
 		print('capture')
-		print(cv2.imwrite('../backgrounds/imagec'+str(count)+'.png', frame))
+		print(cv2.imwrite('rotate/images/image'+str(count)+'.png', frame))
 		count += 1
 	elif k != -1:
 		break

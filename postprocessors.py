@@ -8,9 +8,9 @@ ys = np.array(range(15)) + 0.5
 
 class WeightedAverage(PostProcess):
 	def run(self, img):
-		x = 32 * np.average(xs, weights=np.sum(img, 0))
-		y = 32 * np.average(ys, weights=np.sum(img, 1))
-		return x, y
+		x = np.average(xs, weights=np.sum(img, 0))
+		y = np.average(ys, weights=np.sum(img, 1))
+		return np.array([x, y])
 
 
 class BinaryWeightedAverage(PostProcess):
@@ -23,9 +23,9 @@ class BinaryWeightedAverage(PostProcess):
 		yw = np.sum(img, 1)
 		if np.sum(xw) == 0 or np.sum(yw) == 0:
 			return None
-		x = 32 * np.average(xs, weights=xw)
-		y = 32 * np.average(ys, weights=yw)
-		return x, y
+		x = np.average(xs, weights=xw)
+		y = np.average(ys, weights=yw)
+		return np.array([x, y])
 
 
 class ThresholdBWA(PostProcess):

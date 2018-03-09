@@ -7,7 +7,7 @@ from postprocessors import ThresholdBWA
 from halfsizemodel import HalfSizeModel
 from ogmodel import OGModel
 
-source = Client()
+source = CameraInput()#Client()
 
 model = HalfSizeModel()
 model.load_model()
@@ -22,14 +22,15 @@ def to_float(img):
 
 while True:
 	img = source.get()
-	print(img.shape)
+	h, w, _ = img.shape
 	fimg = cv2.resize(to_float(img), (320, 240))
-	res2 = model.run(fimg).reshape((15, 20))
-	data2 = post.run(res2)
+	res = model.run(fimg).reshape((15, 20))
+	data = post.run(res)
+	data *= w / 20
 	display.display_input(img)
-	display.display_output(res2)
-	aimg = display.display_augmented(img, data2)
-	source.send(data2)
+	display.display_output(res)
+	aimg = display.display_augmented(img, data)
+	source.send(data)
 	k = cv2.waitKey(1)
 	if k != -1:
 		# cv2.imwrite('input.png', img)
