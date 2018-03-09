@@ -40,7 +40,7 @@ def generate_img(mat, label_mat):
 	file = random.choice(images)
 	img = cv2.imread('images/' + file, cv2.IMREAD_UNCHANGED)
 	img = image_to_float(img)
-	color_scale = 0.5 + random.random() * 1.0
+	color_scale = 0.8 + random.random() * 0.7
 	img[:, :, :3] *= color_scale
 	scale = 0.5 + random.random() * 0.2
 	img = cv2.resize(img, None, fx=scale, fy=scale)
@@ -72,7 +72,7 @@ def generate_img(mat, label_mat):
 	bkg = bkg[160:640, 80:720, :]
 	if random.random() < 0.5:
 		cv2.flip(bkg, 0, bkg)
-	color_scale = 0.5 + random.random() * 1.0
+	color_scale = 0.7 + random.random() * 0.6
 	bkg *= color_scale
 	mask = label.astype(np.int8)
 	mask = 1-mask
@@ -171,11 +171,11 @@ def get_batch():
 
 if __name__ == "__main__":
 	while True:
-		create_batch(1, (240, 320), (240, 320))
+		create_batch(1, (240, 320), (15, 20))
 		batch, label = get_batch()
 		image = batch[0]
 		cv2.imshow('image', image)
-		res = cv2.resize(label[0], (320, 240), interpolation=cv2.INTER_NEAREST)
+		res = cv2.resize(label[0], (320, 240), interpolation=cv2.INTER_AREA)
 		cv2.imshow('label', res)
 		k = cv2.waitKey(0)
 		if k == 27:

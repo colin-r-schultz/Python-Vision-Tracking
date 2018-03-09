@@ -44,7 +44,7 @@ class Model(Process):
 		self.optimize = self.create_optimizer().minimize(self.loss)
 
 	def create_optimizer(self):
-		return tf.train.AdamOptimizer(0.001)
+		return tf.train.AdamOptimizer(0.0001)
 
 	def save_model(self):
 		self.saver.save(self.sess, 'save/' + self.name + '.save')

@@ -27,9 +27,9 @@ class HighResModel(Model):
 		self.input, self.output = create_model()
 
 if __name__ == '__main__':
-	LOAD = False
+	LOAD = True
 	model = HighResModel(True)
 	if LOAD:
 		model.load_model()
-	model.train(checkpoint=5)
+	model.train(checkpoint=5, batch_size=64, batches=1000)
 
