@@ -36,7 +36,7 @@ class HardcoreModel(Model):
 		self.input, self.output = create_model()
 
 if __name__ == '__main__':
-	LOAD = False
+	LOAD = True
 	model = HardcoreModel(True)
 	if LOAD:
 		model.load_model()
