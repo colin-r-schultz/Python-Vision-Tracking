@@ -2,6 +2,7 @@ import tensorflow as tf
 import datagenerator
 import cv2
 import numpy as np
+import os
 
 
 class Process:
@@ -48,6 +49,10 @@ class Model(Process):
 
 	def save_model(self):
 		self.saver.save(self.sess, 'save/' + self.name + '.save')
+		os.system('git checkout save')
+		os.system('git add save/')
+		os.system('git commit -m"Save"')
+		os.system('git push')
 		print('Model saved')
 
 	def load_model(self):
