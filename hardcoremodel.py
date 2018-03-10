@@ -11,14 +11,19 @@ def create_model():
 	conv = tf.layers.conv2d(pool1, 128, 3, padding='same', activation=tf.nn.relu, name='conv4')
 	conv = tf.layers.conv2d(conv, 128, 3, padding='same', activation=tf.nn.relu, name='conv5')
 	pool2 = tf.layers.max_pooling2d(conv, 2, 2, name='pool2')
-	conv = tf.layers.conv2d(pool2, 256, 3, padding='same', activation=tf.nn.relu, name='conv6')
+	conv = tf.layers.conv2d(pool2, 128, 3, padding='same', activation=tf.nn.relu, name='conv6')
 	conv = tf.layers.conv2d(conv, 256, 3, padding='same', activation=tf.nn.relu, name='conv7')
 	pool3 = tf.layers.max_pooling2d(conv, 2, 2, name='pool3')
-	conv = tf.layers.conv2d(pool3, 512, 3, padding='same', activation=tf.nn.relu, name='conv8')
-	conv = tf.layers.conv2d(conv, 512, 3, padding='same', activation=tf.nn.relu, name='conv9')
+	conv = tf.layers.conv2d(pool3, 256, 3, padding='same', activation=tf.nn.relu, name='conv8')
+	conv = tf.layers.conv2d(conv, 64, 3, padding='same', activation=tf.nn.relu, name='conv9')
 	resize = tf.image.resize_nearest_neighbor(conv, tf.constant([30, 40], tf.int32))
-	concat = tf.concat([resize, pool2], axis=3)
-	output = tf.layers.conv2d_transpose(concat, 1, 8, 8, activation=tf.nn.sigmoid, use_bias=False, name='output')
+	skip = tf.layers.conv2d(pool2, 64, 1, 1, activation=tf.nn.relu, name='skip2')
+	concat = tf.concat([resize, skip], axis=3)
+	resize = tf.image.resize_nearest_neighbor(concat, tf.constant([60, 80], tf.int32))
+	skip = tf.layers.conv2d(pool1, 64, 1, 1, activation=tf.nn.relu, name='skip1')
+	concat = tf.concat([resize, skip], axis=3)
+	conv = tf.layers.conv2d(pool1, 128, 1, 1, activation=tf.nn.relu, name='conv10')
+	output = tf.layers.conv2d_transpose(concat, 1, 4, 4, activation=tf.nn.sigmoid, use_bias=False, name='output')
 
 	return inp, output
 
@@ -35,5 +40,5 @@ if __name__ == '__main__':
 	model = HardcoreModel(True)
 	if LOAD:
 		model.load_model()
-	model.train(checkpoint=5, batch_size=32, batches=1000)
+	model.train(checkpoint=5, batch_size=64, batches=1000)
 

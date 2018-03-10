@@ -1,7 +1,10 @@
 import cv2
 import numpy as np
 from highresmodel import HighResModel
+from hardcoremodel import HardcoreModel
 import datagenerator
+import time
+import tensorflow as tf
 
 model = HighResModel()
 model.load_model()
@@ -13,7 +16,9 @@ while True:
 	cv2.imshow('image', image)
 	label = cv2.resize(label[0], (320, 240), interpolation=cv2.INTER_NEAREST)
 	cv2.imshow('label', label)
+	start = time.time()
 	res = model.run(image).reshape((240, 320))
+	print(time.time() - start)
 	cv2.imshow('result', res)
 	inter = np.sum(res * label)
 	union = np.sum(res + label) - inter
