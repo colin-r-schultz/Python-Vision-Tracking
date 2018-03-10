@@ -5,8 +5,8 @@ import random
 import os
 
 
-backgrounds = os.listdir('/Users/Family/PycharmProjects/VisionTracking/backgrounds')
-images = os.listdir('/Users/Family/PycharmProjects/VisionTracking/images')
+backgrounds = os.listdir('backgrounds')
+images = os.listdir('images')
 
 
 class GeneratorThread(Thread):

@@ -6,7 +6,7 @@ import datagenerator
 import time
 import tensorflow as tf
 
-model = HighResModel()
+model = HardcoreModel()
 model.load_model()
 
 while True:
