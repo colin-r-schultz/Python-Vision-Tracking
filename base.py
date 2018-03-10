@@ -16,7 +16,6 @@ class Process:
 
 def gitsave(message):
 	def save():
-		os.system('git checkout save')
 		os.system('git add save/')
 		os.system('git commit -m"{}"'.format(message))
 		os.system('git push')

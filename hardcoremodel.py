@@ -40,5 +40,5 @@ if __name__ == '__main__':
 	model = HardcoreModel(True)
 	if LOAD:
 		model.load_model()
-	model.train(checkpoint=5, batch_size=64, batches=1000)
+	model.train(checkpoint=5, batch_size=64, batches=1000, gitcheckpoint=50)
 
