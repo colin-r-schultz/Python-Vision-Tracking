@@ -2,11 +2,12 @@ import cv2
 import numpy as np
 from highresmodel import HighResModel
 from hardcoremodel import HardcoreModel
+from legitmodel import LegitModel
 import datagenerator
 import time
 import tensorflow as tf
 
-model = HardcoreModel()
+model = LegitModel()
 model.load_model()
 
 while True:
