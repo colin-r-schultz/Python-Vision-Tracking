@@ -2,8 +2,6 @@ import tensorflow as tf
 import datagenerator
 import cv2
 import numpy as np
-import os
-import threading
 
 
 class Process:
@@ -12,14 +10,6 @@ class Process:
 
 	def run(self, img):
 		return img
-
-
-def gitsave(message):
-	def save():
-		os.system('git add save/')
-		os.system('git commit -m"{}"'.format(message))
-		os.system('git push')
-	threading.Thread(target=save).start()
 
 
 class Model(Process):
@@ -66,7 +56,7 @@ class Model(Process):
 	def run(self, img):
 		return self.sess.run(self.output, feed_dict={self.input: [img]})[0]
 
-	def train(self, batches=100, batch_size=32, epochs=5, checkpoint=5, gitcheckpoint=0):
+	def train(self, batches=100, batch_size=32, epochs=5, checkpoint=5):
 		if not self.allow_train:
 			print('The model was not built to be trained')
 			return
@@ -83,8 +73,6 @@ class Model(Process):
 			print('Loss: {}'.format(loss_n.reshape((1,))[0]))
 			if checkpoint != 0 and (i + 1) % checkpoint == 0:
 				self.save_model()
-			if gitcheckpoint != 0 and (i + 1) % gitcheckpoint == 0:
-				gitsave('Last loss: {}'.format(loss_n))
 		print('Done')
 		try:
 			from matplotlib import pyplot as plt
