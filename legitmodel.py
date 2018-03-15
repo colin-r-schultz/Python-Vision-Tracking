@@ -48,9 +48,9 @@ class LegitModel(Model):
 		self.input, self.output = create_model()
 
 if __name__ == '__main__':
-	LOAD = False
+	LOAD = True
 	model = LegitModel(True)
 	if LOAD:
 		model.load_model()
-	model.train(checkpoint=5, batch_size=32, batches=1000)
+	model.train(checkpoint=5, batch_size=32, batches=-1)
 

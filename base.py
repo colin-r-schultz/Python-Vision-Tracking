@@ -12,6 +12,12 @@ class Process:
 		return img
 
 
+def infinite_range():
+	index = -1
+	while True:
+		index += 1
+		yield index
+
 class Model(Process):
 	def __init__(self, name, train=False, input_size=(480, 640), output_size=(15, 20)):
 		self.name = name
@@ -62,7 +68,10 @@ class Model(Process):
 			return
 		datagenerator.create_batch(batch_size, self.input_size, self.label_size)
 		losses = list()
-		for i in range(batches):
+		rg = range(batches)
+		if batches == -1:
+			rg = infinite_range()
+		for i in rg:
 			batch, label = datagenerator.get_batch()
 			datagenerator.create_batch(batch_size, self.input_size, self.label_size)
 			for j in range(epochs):
