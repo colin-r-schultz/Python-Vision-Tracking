@@ -52,5 +52,5 @@ if __name__ == '__main__':
 	model = LegitModel(True)
 	if LOAD:
 		model.load_model()
-	model.train(checkpoint=5, batch_size=32, batches=-1)
+	model.train(checkpoint=5, batch_size=64, batches=-1)
 
