@@ -17,7 +17,7 @@ def compress_and_decompress(img):
 class CameraInput(Input):
 	def __init__(self, compress=False):
 		super().__init__()
-		self.cap = cv2.VideoCapture(1)
+		self.cap = cv2.VideoCapture(0)
 		self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 		self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 		self.compress = compress

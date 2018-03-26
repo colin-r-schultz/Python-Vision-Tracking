@@ -8,7 +8,7 @@ from base import Input
 
 
 class Client(Input):
-	def __init__(self, local_port=5555, server_port = 1920, packet_size=60000):
+	def __init__(self, local_port=5555, server_port=1920, packet_size=60000):
 		super().__init__()
 		self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		self.socket.bind(('', local_port))
@@ -24,7 +24,8 @@ class Client(Input):
 		return ar
 
 	def send(self, data):
+		print(data)
 		if data is None:
 			return
-		send = struct.pack('>2d', *data)
+		send = struct.pack('>{}d'.format(len(data)), *data)
 		self.socket.sendto(send, ('roborio-192-frc.local', self.port))

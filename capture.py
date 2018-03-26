@@ -1,7 +1,7 @@
 import cv2
 import os
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
@@ -16,7 +16,7 @@ while True:
 	k = cv2.waitKey(5)
 	if k == 32:
 		print('capture')
-		print(cv2.imwrite('rotate/images/image'+str(count)+'.png', frame))
+		print(cv2.imwrite('image.png', frame))
 		count += 1
 	elif k != -1:
 		break
