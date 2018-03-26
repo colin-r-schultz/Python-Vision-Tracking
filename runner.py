@@ -13,7 +13,7 @@ model.load_model()
 display = Display()
 
 src = np.array([[158, 464], [452, 454], [431, 330], [300, 250]], dtype=np.float32)
-dst = np.array([[28, -12], [28, 12], [40, 12], [50, 0]], dtype=np.float32)
+dst = np.array([[50, 12], [50, -12], [38, -12], [38, 12]], dtype=np.float32)
 dst *= 0.0254
 M = cv2.getPerspectiveTransform(src, dst)
 print(M)
@@ -52,8 +52,6 @@ while True:
 		p2 = p2[0:2]/p2[2]
 		theta = math.atan((p1[1] - p2[1])/(p1[0] - p2[0]))
 		source.send((p1[0], p1[1], theta))
-	else:
-		source.send((float('nan'), float('nan'), float('nan')))
 	display.display_input(img)
 	k = cv2.waitKey(1)
 	if k != -1:
