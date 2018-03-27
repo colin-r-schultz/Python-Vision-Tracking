@@ -12,7 +12,7 @@ model = LegitModel()
 model.load_model()
 display = Display()
 
-src = np.array([[158, 464], [452, 454], [431, 330], [300, 250]], dtype=np.float32)
+src = np.array([[424, 143], [185, 146], [173, 245], [439, 242]], dtype=np.float32)
 dst = np.array([[50, 12], [50, -12], [38, -12], [38, 12]], dtype=np.float32)
 dst *= 0.0254
 M = cv2.getPerspectiveTransform(src, dst)
