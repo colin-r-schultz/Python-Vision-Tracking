@@ -15,7 +15,8 @@ class Client(Input):
 		self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, packet_size+16)
 		self.size = packet_size
 		self.port = server_port
-		self.socket.sendto('join'.encode(), ('roborio-192-frc.local', server_port))
+		self.address = socket.gethostbyname('roborio-192-frc.local')
+		self.socket.sendto('join'.encode(), (self.address, server_port))
 
 	def get(self):
 		ar = self.socket.recv(self.size)
@@ -28,4 +29,4 @@ class Client(Input):
 		if data is None:
 			return
 		send = struct.pack('>{}d'.format(len(data)), *data)
-		self.socket.sendto(send, ('roborio-192-frc.local', self.port))
+		self.socket.sendto(send, (self.address, self.port))
