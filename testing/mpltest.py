@@ -1,4 +1,4 @@
-from matplotlib import pyplot as plt
+import cv2
 
-plt.plot([1, 2, 4, 3, 5])
-plt.show()
+cap = cv2.VideoCapture(0)
+print(cv2.getBuildInformation())

@@ -8,53 +8,40 @@ import datagenerator
 import tensorflow as tf
 import math
 
-model = SketchyModel()
+model = LegitModel()
 model.load_model()
+
+
+def to_float(img):
+	img = img.astype(np.float32)
+	img /= 255
+	return img
 
 while True:
 	datagenerator.create_batch(1, (240, 320), (240, 320))
 	batch, label = datagenerator.get_batch()
-	image = batch[0]
-	cv2.imshow('image', image)
-	label = cv2.resize(label[0], (320, 240), interpolation=cv2.INTER_NEAREST)
-	ilabel = (label * 255).astype(np.uint8)
-	edges = cv2.Canny(ilabel, 200, 255)
-	lines = cv2.HoughLinesP(edges, 1, np.pi/180, 10, maxLineGap=15)
-	cv2.imshow('label edges', edges)
-	ilabel = cv2.cvtColor(ilabel, cv2.COLOR_GRAY2BGR)
-	lines = lines.reshape([-1, 4])
-	my = 0
-	mi = None
-	for i in range(len(lines)):
-		x1, y1, x2, y2 = lines[i]
-		if max(y1, y2) > my:
-			my = max(y1, y2)
-			mi = i
-		ilabel = cv2.line(ilabel, (x1, y1), (x2, y2), (0, 255, 0), 2)
-	x1, y1, x2, y2 = lines[mi]
-	ilabel = cv2.line(ilabel, (x1, y1), (x2, y2), (0, 0, 255), 2)
-	print(math.atan((y1-y2)/(x1-x2)))
-	cv2.imshow('label', ilabel)
-	res = model.run(image).reshape((60, 80))
-	# res2 = cv2.resize(res, (80, 60))
-	ires = (res * 255).astype(np.uint8)
-	edges = cv2.Canny(ires, 200, 255)
-	cv2.imshow('res edges', edges)
-	lines = cv2.HoughLinesP(edges, 1, np.pi/180, 5, minLineLength=5, maxLineGap=7)
-	lines = lines.reshape([-1, 4])
-	res = cv2.cvtColor(res, cv2.COLOR_GRAY2BGR)
-	my = 0
-	mi = None
-	for i in range(len(lines)):
-		x1, y1, x2, y2 = lines[i]
-		if max(y1, y2) > my:
-			my = max(y1, y2)
-			mi = i
-		res = cv2.line(res, (x1, y1), (x2, y2), (0, 255, 0), 1)
-	x1, y1, x2, y2 = lines[mi]
-	res = cv2.line(res, (x1, y1), (x2, y2), (0, 0, 255), 1)
-	print(math.atan((y1 - y2) / (x1 - x2)))
-	cv2.imshow('result', res)
+	img = batch[0]
+	fimg = cv2.resize(img, (320, 240))
+	res = model.run(fimg).reshape((240, 320))
+	sm = (cv2.resize(res, (80, 60)) * 255).astype(np.uint8)
+	edges = cv2.Canny(sm, 200, 254)
+	lines = cv2.HoughLinesP(edges, 1, np.pi / 20, 10, minLineLength=8, maxLineGap=20)
+	res = cv2.resize(res, (640, 480)).reshape((480, 640, 1))
+	img = cv2.resize(img, (640, 480))
+	img[:,:,0:2] -= 0.5 * res * img[:,:,0:2]
+	img[:,:,2] += res[:,:,0]
+	if lines is not None:
+		lines = lines.reshape((-1, 4))
+		my = 0
+		mi = -1
+		for i in range(len(lines)):
+			x1, y1, x2, y2 = lines[i]
+			if max(y1, y2) > my:
+				my = max(y1, y2)
+				mi = i
+		x1, y1, x2, y2 = lines[mi] * 8
+		cv2.line(img, (x1, y1), (x2, y2), (1, 0, 0), 2)
+	cv2.imshow('image', img)
 	k = cv2.waitKey(0)
 	if k == 27:
 		break

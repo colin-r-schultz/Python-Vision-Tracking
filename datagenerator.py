@@ -171,12 +171,13 @@ def get_batch():
 
 if __name__ == "__main__":
 	while True:
-		create_batch(1, (240, 320), (30, 40))
+		create_batch(1, (240, 320), (240, 320))
 		batch, label = get_batch()
 		image = batch[0]
 		cv2.imshow('image', image)
-		res = cv2.resize(label[0], (320, 240), interpolation=cv2.INTER_LINEAR)
-		cv2.imshow('label', res)
+		cv2.imshow('label', label[0])
 		k = cv2.waitKey(0)
 		if k == 27:
+			cv2.imwrite('image.png', image * 255)
+			cv2.imwrite('label.png', label[0] * 255)
 			break

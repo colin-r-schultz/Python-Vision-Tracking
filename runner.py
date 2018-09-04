@@ -6,7 +6,7 @@ from client import Client
 from legitmodel import LegitModel
 import math
 
-source = Client()
+source = CameraInput()
 
 model = LegitModel()
 model.load_model()
@@ -27,12 +27,15 @@ def to_float(img):
 while True:
 	img = source.get()
 	h, w, _ = img.shape
-	fimg = cv2.resize(to_float(img), (320, 240))
-	res = model.run(fimg).reshape((240, 320))
-	res = (cv2.resize(res, (80, 60)) * 255).astype(np.uint8)
-	edges = cv2.Canny(res, 200, 254)
-	lines = cv2.HoughLinesP(edges, 1, np.pi/20, 10, minLineLength=8, maxLineGap=20)
+	img = cv2.resize(to_float(img), (320, 240))
+	res = model.run(img).reshape((240, 320))
+	sm = (cv2.resize(res, (80, 60)) * 255).astype(np.uint8)
+	edges = cv2.Canny(sm, 200, 254)
+	lines = cv2.HoughLinesP(edges, 1, np.pi / 20, 10, minLineLength=8, maxLineGap=20)
+	res = cv2.resize(res, (640, 480)).reshape((480, 640, 1))
 	img = cv2.resize(img, (640, 480))
+	img[:,:,0:2] -= 0.5 * res * img[:,:,0:2]
+	img[:,:,2] += res[:,:,0]
 	if lines is not None:
 		lines = lines.reshape((-1, 4))
 		my = 0
@@ -43,16 +46,8 @@ while True:
 				my = max(y1, y2)
 				mi = i
 		x1, y1, x2, y2 = lines[mi] * 8
-		cv2.line(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
-		if y2 > y1:
-			x2, y2, x1, y1 = lines[mi] * 8
-		p1 = np.dot(M, np.array([x1, y1, 1]))
-		p2 = np.dot(M, np.array([x2, y2, 1]))
-		p1 = p1[0:2]/p1[2]
-		p2 = p2[0:2]/p2[2]
-		theta = math.atan((p1[1] - p2[1])/(p1[0] - p2[0]))
-		source.send((p1[0], p1[1], theta))
-	display.display_input(img)
+		cv2.line(img, (x1, y1), (x2, y2), (1, 0, 0), 2)
+	cv2.imshow('image', img)
 	k = cv2.waitKey(1)
 	if k != -1:
 		# cv2.imwrite('input.png', img)
